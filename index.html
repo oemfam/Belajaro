@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Belajaro - Belajar Bahasa Mandarin</title>
+
+  <!-- PWA CONFIGURE -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0D1B2A">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3233/3233004.png">
+
   <style>
     :root {
       --navy: #0D1B2A;
@@ -72,6 +78,17 @@
       border-radius: 50%;
       margin-bottom: 10px;
     }
+    #pwa-install-banner {
+      display: none;
+      background: #fff3cd;
+      color: #856404;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 14px;
+      border: 1px solid #ffeeba;
+    }
   </style>
 </head>
 <body>
@@ -83,6 +100,14 @@
 
   <div class="container">
     
+    <!-- BANNER INSTALL PWA -->
+    <div id="pwa-install-banner">
+      📱 Pasang aplikasi <strong>Belajaro</strong> di HP Anda agar lebih praktis!
+      <button class="btn" id="install-pwa-btn" style="background-color: var(--navy); padding: 8px; margin-top: 8px;">
+        Install Aplikasi Belajaro
+      </button>
+    </div>
+
     <!-- CARD LOGIN / PROFIL -->
     <div class="card" style="border-top-color: var(--navy);">
       <div id="login-section">
@@ -114,6 +139,36 @@
 
   </div>
 
+  <!-- REGISTER SERVICE WORKER FOR PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker Registered:', reg.scope))
+          .catch(err => console.error('Service Worker Error:', err));
+      });
+    }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('pwa-install-banner').style.display = 'block';
+    });
+
+    document.getElementById('install-pwa-btn').addEventListener('click', () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            document.getElementById('pwa-install-banner').style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      }
+    });
+  </script>
+
   <!-- FIREBASE SDK & SKRIP UTAMA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -133,27 +188,16 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Event listener untuk tombol Login
     document.getElementById("login-btn").addEventListener("click", () => {
       signInWithPopup(auth, provider)
-        .then((result) => {
-          console.log("Login Berhasil:", result.user.displayName);
-        })
-        .catch((error) => {
-          alert("Gagal Login: " + error.message);
-        });
+        .then((result) => console.log("Login Berhasil:", result.user.displayName))
+        .catch((error) => alert("Gagal Login: " + error.message));
     });
 
-    // Event listener untuk tombol Logout
     document.getElementById("logout-btn").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        alert("Berhasil keluar.");
-      }).catch((error) => {
-        console.error(error);
-      });
+      signOut(auth).then(() => alert("Berhasil keluar."));
     });
 
-    // Pantau Status Login
     onAuthStateChanged(auth, (user) => {
       const loginSection = document.getElementById("login-section");
       const userProfile = document.getElementById("user-profile");
