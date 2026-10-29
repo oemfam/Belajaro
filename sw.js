@@ -1,21 +1,36 @@
-const CACHE_NAME = 'belajaro-v1';
-const urlsToCache = [
-  '/Belajaro/',
-  '/Belajaro/index.html'
-];
+const CACHE_NAME = 'belajaro-v2'; // Ubah versi tiap kali update besar
 
+// Saat diinstal, langsung aktifkan tanpa menunggu
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
-  );
+  self.skipWaiting();
 });
 
+// Hapus cache lama yang menumpuk saat ada update baru
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Menghapus cache lama:', cache);
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// Strategi Network First: Utamakan ambil data terbaru dari internet, fallback ke cache jika offline
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then((response) => {
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
