@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Belajaro - Belajar Bahasa Mandarin</title>
+  <style>
+    :root {
+      --navy: #0D1B2A;
+      --gold: #D4AF37;
+      --red: #C0392B;
+      --bg: #F8F9FA;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg);
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: var(--navy);
+      color: white;
+      padding: 1.2rem;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .container {
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border-top: 4px solid var(--red);
+    }
+    .btn {
+      background-color: var(--red);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+    .btn-google {
+      background-color: white;
+      color: #444;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-google:hover {
+      background-color: #f1f1f1;
+    }
+    #user-profile {
+      display: none;
+      text-align: center;
+    }
+    #user-profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 style="margin:0; font-size:22px;">🏮 Belajaro Mandarin</h1>
+    <p style="margin:5px 0 0 0; font-size:12px; color: var(--gold);">Kuasai Mandarin Mudah & Fun</p>
+  </header>
+
+  <div class="container">
+    
+    <!-- CARD LOGIN / PROFIL -->
+    <div class="card" style="border-top-color: var(--navy);">
+      <div id="login-section">
+        <h3 style="margin-top:0; color:var(--navy);">👤 Akun Belajaro</h3>
+        <p style="font-size:14px; color:#666;">Silakan masuk untuk mencatat progress belajar dan akses kelas Anda.</p>
+        <button class="btn btn-google" id="login-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.14C3.21 21.36 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.62H1.19C.43 8.16 0 9.89 0 12s.43 3.84 1.19 5.38l4.08-3.14z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.21 2.64 1.19 6.62l4.08 3.14c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+          Masuk dengan Google
+        </button>
+      </div>
+
+      <div id="user-profile">
+        <img id="user-photo" src="" alt="Foto Profil">
+        <h4 id="user-name" style="margin:0; color:var(--navy);"></h4>
+        <p id="user-email" style="font-size:12px; color:#666; margin:5px 0 15px 0;"></p>
+        <button class="btn" style="background-color:#555; padding:8px;" id="logout-btn">Keluar</button>
+      </div>
+    </div>
+
+    <!-- CARD KELAS ZOOM -->
+    <div class="card">
+      <h3 style="margin-top:0; color:var(--navy);">🎥 Kelas Zoom HSK 1 Pemula</h3>
+      <p style="font-size:14px; color:#666;">
+        📅 Setiap Sabtu | ⏰ 19:30 WIB<br>
+        🎟️ Biaya: <strong>Rp 5.000</strong> / sesi
+      </p>
+      <button class="btn" id="daftar-btn">Daftar & Ambil Tiket Zoom</button>
+    </div>
+
+  </div>
+
+  <!-- FIREBASE SDK & SKRIP UTAMA -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCrSnJYSAR82I7ZUacCXyfdSBVI_d5-g1E",
+      authDomain: "belajaro-sukses.firebaseapp.com",
+      projectId: "belajaro-sukses",
+      storageBucket: "belajaro-sukses.firebasestorage.app",
+      messagingSenderId: "263798805052",
+      appId: "1:263798805052:web:14dd579628abb596772939",
+      measurementId: "G-QX2SDD4VDC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Event listener untuk tombol Login
+    document.getElementById("login-btn").addEventListener("click", () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          console.log("Login Berhasil:", result.user.displayName);
+        })
+        .catch((error) => {
+          alert("Gagal Login: " + error.message);
+        });
+    });
+
+    // Event listener untuk tombol Logout
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        alert("Berhasil keluar.");
+      }).catch((error) => {
+        console.error(error);
+      });
+    });
+
+    // Pantau Status Login
+    onAuthStateChanged(auth, (user) => {
+      const loginSection = document.getElementById("login-section");
+      const userProfile = document.getElementById("user-profile");
+      
+      if (user) {
+        loginSection.style.display = "none";
+        userProfile.style.display = "block";
+        document.getElementById("user-name").innerText = user.displayName;
+        document.getElementById("user-email").innerText = user.email;
+        document.getElementById("user-photo").src = user.photoURL;
+      } else {
+        loginSection.style.display = "block";
+        userProfile.style.display = "none";
+      }
+    });
+
+    document.getElementById("daftar-btn").addEventListener("click", () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        alert("Silakan Login dengan Google terlebih dahulu sebelum mendaftar kelas!");
+        return;
+      }
+      alert("Mengarahkan " + currentUser.displayName + " ke halaman pembayaran Mayar Rp5.000...");
+    });
+  </script>
+</body>
+</html>
